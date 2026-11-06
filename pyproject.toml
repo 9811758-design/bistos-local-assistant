@@ -1,0 +1,61 @@
+[project]
+name = "bistos-local-assistant"
+version = "1.0.0"
+description = "Local manual search and grounded answers for Bistos staff"
+requires-python = ">=3.12"
+dependencies = [
+  "fastapi>=0.115,<1",
+  "uvicorn>=0.34,<1",
+  "pydantic>=2.11,<3",
+  "httpx2[http2,brotli,zstd]>=2",
+  "python-multipart>=0.0.20",
+  "pypdf>=6,<7",
+  "python-docx>=1.2,<2",
+  "jsonschema>=4.23,<5",
+  "pywin32>=311; sys_platform == 'win32'",
+  "cryptography>=45",
+]
+
+[dependency-groups]
+dev = ["pytest>=8.4,<10", "ruff>=0.12", "basedpyright>=1.31"]
+
+[tool.bistos.architecture]
+storage = "stdlib sqlite3 with short-lived connections and WAL"
+http_client = "httpx2: shared with Starlette TestClient; no redirects/proxy, loopback only"
+
+[tool.basedpyright]
+typeCheckingMode = "all"
+pythonVersion = "3.12"
+pythonPlatform = "Windows"
+include = ["bistos"]
+exclude = ["runtime", "data", ".venv"]
+reportUnusedCallResult = false
+reportUnknownMemberType = false
+reportAny = false
+reportExplicitAny = "error"
+reportUnannotatedClassAttribute = false
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+exclude = ["runtime", "data", ".venv"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "D100", "D101", "D102", "D103", "D104", "D105", "D107", "D203", "D213",
+  "COM812", "ISC001", "FBT001", "FBT002", "FBT003",
+  "PLR0913", "PLR2004", "TRY003", "EM101", "EM102", "BLE001",
+  "TC001", "TC002", "TC003",
+  "CPY001", "PLR0917",
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*.py" = ["S101", "ARG", "SLF001", "S106", "S105", "D"]
+"bistos/routes_*.py" = ["B008", "C901"]
+"bistos/server.py" = ["C901"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = ["-ra", "--strict-markers"]

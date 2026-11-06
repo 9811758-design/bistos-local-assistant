@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["selected_ids"],
+  "properties": {
+    "selected_ids": {
+      "type": "array",
+      "maxItems": 4,
+      "uniqueItems": true,
+      "items": {"type": "string", "pattern": "^P[1-9][0-9]*$"}
+    }
+  }
+}

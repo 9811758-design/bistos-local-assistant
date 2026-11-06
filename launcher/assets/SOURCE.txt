@@ -1,0 +1,10 @@
+Official Bistos logo
+Source page: https://www.bistos.co.kr/
+Original asset: https://www.bistos.co.kr/wp-content/uploads/2023/08/00.logo-bistos-1.png
+Retrieved: 2026-10-20
+Original dimensions: 789 x 244
+SHA-256: FEAD0B7C1C03D093EAD72DF318AEE9FD72EEFDEC3BA09BF85E5A49FD06444B91
+
+bistos-logo.png is the original unmodified website header image.
+bistos-logo.ico contains scaled copies of the complete logo on a white square.
+The icon is generated locally by scripts/build-launcher.ps1.

@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BistosEvidenceAudit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["verdict", "issues"],
+  "properties": {
+    "verdict": {"enum": ["supported", "unsupported", "uncertain"]},
+    "issues": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["target", "code", "reason"],
+        "properties": {
+          "target": {"type": "string", "minLength": 1, "maxLength": 80},
+          "code": {
+            "enum": [
+              "unknown_citation",
+              "unsupported_claim",
+              "model_mismatch",
+              "missing_condition",
+              "source_conflict_omitted",
+              "visual_check_missing",
+              "procedure_not_authorized",
+              "incomplete_evidence"
+            ]
+          },
+          "reason": {"type": "string", "minLength": 1, "maxLength": 300}
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"verdict": {"const": "supported"}}},
+      "then": {"properties": {"issues": {"maxItems": 0}}},
+      "else": {"properties": {"issues": {"minItems": 1}}}
+    }
+  ]
+}

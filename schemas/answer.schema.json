@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BistosEvidenceAnswer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["status", "claims", "conflicts", "questions", "limitation_codes"],
+  "properties": {
+    "status": {
+      "enum": [
+        "answered",
+        "partial_answer",
+        "clarification_required",
+        "evidence_missing",
+        "conflict",
+        "visual_review_required",
+        "service_required"
+      ]
+    },
+    "claims": {
+      "type": "array",
+      "maxItems": 8,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "text", "citation_ids"],
+        "properties": {
+          "id": {"type": "string", "pattern": "^C[1-8]$"},
+          "text": {"type": "string", "minLength": 1, "maxLength": 2400},
+          "citation_ids": {"$ref": "#/$defs/citation_ids"}
+        }
+      }
+    },
+    "conflicts": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["topic", "variants"],
+        "properties": {
+          "topic": {"type": "string", "minLength": 1, "maxLength": 150},
+          "variants": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 4,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["text", "citation_ids"],
+              "properties": {
+                "text": {"type": "string", "minLength": 1, "maxLength": 700},
+                "citation_ids": {"$ref": "#/$defs/citation_ids"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "questions": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {"type": "string", "minLength": 1, "maxLength": 200}
+    },
+    "limitation_codes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "model_unclear",
+          "applicability_unconfirmed",
+          "no_matching_evidence",
+          "incomplete_evidence",
+          "source_conflict",
+          "visual_review_pending",
+          "service_authorization_required"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "citation_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 6,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1, "maxLength": 160}
+    }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"status": {"const": "answered"}}},
+      "then": {
+        "properties": {
+          "claims": {"minItems": 1},
+          "conflicts": {"maxItems": 0}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "partial_answer"}}},
+      "then": {
+        "properties": {
+          "claims": {"minItems": 1},
+          "limitation_codes": {"contains": {"const": "incomplete_evidence"}}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "conflict"}}},
+      "then": {
+        "properties": {
+          "conflicts": {"minItems": 1},
+          "limitation_codes": {"contains": {"const": "source_conflict"}}
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "enum": [
+              "clarification_required",
+              "evidence_missing",
+              "visual_review_required",
+              "service_required"
+            ]
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "claims": {"maxItems": 0},
+          "conflicts": {"maxItems": 0},
+          "limitation_codes": {"minItems": 1}
+        }
+      }
+    },
+    {
+      "if": {"properties": {"status": {"const": "clarification_required"}}},
+      "then": {"properties": {"questions": {"minItems": 1}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "visual_review_required"}}},
+      "then": {"properties": {"limitation_codes": {"contains": {"const": "visual_review_pending"}}}}
+    },
+    {
+      "if": {"properties": {"status": {"const": "service_required"}}},
+      "then": {"properties": {"limitation_codes": {"contains": {"const": "service_authorization_required"}}}}
+    }
+  ]
+}
